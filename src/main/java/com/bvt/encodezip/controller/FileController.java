@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
+import java.nio.channels.FileChannel;
 
 @RestController
 public class FileController {
@@ -66,7 +66,26 @@ public class FileController {
     @PostMapping("/decode_file")
     public Result decodeFile(@RequestParam("file_name") String fileName) {
         File destinationFile = new File(uploadFilePath +'/'+ fileName);
-        fileService.decodeFile(destinationFile, uploadFilePath+"/decode");
+        File copyFile = new File(uploadFilePath+"/TEMP");
+        try {
+            if (!copyFile.exists()) {
+                copyFile.createNewFile();
+            }
+            FileChannel inputChannel;
+            FileChannel outputChannel;
+
+            inputChannel = new FileInputStream(destinationFile).getChannel();
+            outputChannel = new FileOutputStream(copyFile).getChannel();
+            outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+            inputChannel.close();
+            outputChannel.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        fileService.decodeFile(copyFile, uploadFilePath+"/decode");
         return Result.ok("解密成功");
     }
 }
