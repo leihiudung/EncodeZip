@@ -6,8 +6,7 @@ import com.bvt.encodezip.util.JacksonUtils;
 import com.bvt.encodezip.util.JwtUtils;
 import com.bvt.encodezip.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -21,12 +20,14 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @Description: JWT登录过滤器 (表单方式可以使用UsernamePasswordAuthenticationFilter ,非表单使用当前抽象类)
+ * @Author: Tom
+ */
 public class JwtLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Autowired
     LoginLogService loginLogService;
-
-    AuthenticationManager authenticationManager;
 
     public JwtLoginFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager, LoginLogService loginLogService) {
         super(defaultFilterProcessesUrl);
@@ -61,6 +62,23 @@ public class JwtLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        super.unsuccessfulAuthentication(request, response, failed);
+        response.setContentType("application/json;charset=utf-8");
+        String msg = failed.getMessage();
+        //登录不成功时，会抛出对应的异常
+        if (failed instanceof LockedException) {
+            msg = "账号被锁定";
+        } else if (failed instanceof CredentialsExpiredException) {
+            msg = "密码过期";
+        } else if (failed instanceof AccountExpiredException) {
+            msg = "账号过期";
+        } else if (failed instanceof DisabledException) {
+            msg = "账号被禁用";
+        } else if (failed instanceof BadCredentialsException) {
+            msg = "用户名或密码错误";
+        }
+        PrintWriter out = response.getWriter();
+        out.write(JacksonUtils.writeValueAsString(Result.create(401, msg)));
+        out.flush();
+        out.close();
     }
 }
