@@ -38,13 +38,33 @@ public class JwtLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
-        User user = JacksonUtils.readValue(httpServletRequest.getInputStream(), User.class);
-        Authentication authentication = getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-        return authentication;
+        try {
+            if (!"POST".equals(httpServletRequest.getMethod())) {
+                throw new RuntimeException("请求方法错误");
+            }
+            String name = httpServletRequest.getParameter("username");
+            String password = httpServletRequest.getParameter("password");
+
+            User user = JacksonUtils.readValue(httpServletRequest.getInputStream(), User.class);
+//            String username = user.getUsername();
+//            currentUsername.set(user.getUsername());
+//            System.out.println("这是传入的值" + username + ":" + user.getPassword() + ":" + user.getUsername());
+            return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        } catch (RuntimeException exception) {
+            httpServletResponse.setContentType("application/json;charset=utf-8");
+            Result result = Result.create(400, "非法请求");
+            PrintWriter out = httpServletResponse.getWriter();
+            out.write(JacksonUtils.writeValueAsString(result));
+            out.flush();
+            out.close();
+        }
+        return null;
+
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                            FilterChain chain, Authentication authResult) throws IOException {
         String jwt = JwtUtils.generateToken(authResult.getName(), authResult.getAuthorities());
         response.setContentType("application/json;charset=utf-8");
         User user = (User) authResult.getPrincipal();
@@ -57,23 +77,23 @@ public class JwtLoginFilter extends AbstractAuthenticationProcessingFilter {
         out.write(JacksonUtils.writeValueAsString(result));
         out.flush();
         out.close();
-
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException exception) throws IOException {
         response.setContentType("application/json;charset=utf-8");
-        String msg = failed.getMessage();
+        String msg = exception.getMessage();
         //登录不成功时，会抛出对应的异常
-        if (failed instanceof LockedException) {
+        if (exception instanceof LockedException) {
             msg = "账号被锁定";
-        } else if (failed instanceof CredentialsExpiredException) {
+        } else if (exception instanceof CredentialsExpiredException) {
             msg = "密码过期";
-        } else if (failed instanceof AccountExpiredException) {
+        } else if (exception instanceof AccountExpiredException) {
             msg = "账号过期";
-        } else if (failed instanceof DisabledException) {
+        } else if (exception instanceof DisabledException) {
             msg = "账号被禁用";
-        } else if (failed instanceof BadCredentialsException) {
+        } else if (exception instanceof BadCredentialsException) {
             msg = "用户名或密码错误";
         }
         PrintWriter out = response.getWriter();

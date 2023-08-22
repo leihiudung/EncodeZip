@@ -1,5 +1,6 @@
 package com.bvt.encodezip.controller;
 
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -10,5 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @description: TODO
  */
 @RestController
+@RequestMapping("/admin")
 public class UserController {
+
+
 }
