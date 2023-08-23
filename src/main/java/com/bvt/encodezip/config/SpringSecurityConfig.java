@@ -2,6 +2,7 @@ package com.bvt.encodezip.config;
 
 import com.bvt.encodezip.config.filter.JwtFilter;
 import com.bvt.encodezip.config.filter.JwtLoginFilter;
+import com.bvt.encodezip.config.filter.TempFilter;
 import com.bvt.encodezip.service.LoginLogService;
 import com.bvt.encodezip.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 //自定义JWT过滤器
                 .addFilterBefore(new JwtLoginFilter("/admin/login", authenticationManager(), loginLogService), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new TempFilter("/adminlogin"), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 //未登录时，返回json，在前端执行重定向
                 .exceptionHandling().authenticationEntryPoint(myAuthenticationEntryPoint);

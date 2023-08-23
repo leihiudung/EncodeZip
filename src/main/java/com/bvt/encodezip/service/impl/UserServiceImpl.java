@@ -23,8 +23,6 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
-    UserServiceImpl userService;
-    @Autowired
     UserMapper userMapper;
 
     @Override

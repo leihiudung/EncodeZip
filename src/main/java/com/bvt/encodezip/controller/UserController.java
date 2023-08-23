@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @description: TODO
  */
 @RestController
-@RequestMapping("/admin")
 public class UserController {
 
 
