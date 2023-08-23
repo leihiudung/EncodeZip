@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.channels.FileChannel;
 
 @RestController
+@RequestMapping("/employee")
 public class FileController {
 
     @Autowired
@@ -29,6 +30,12 @@ public class FileController {
         return Result.ok("work");
     }
 
+    @GetMapping("/all_file")
+    public Result findFile() {
+
+        return Result.ok("找到了");
+    }
+
     @GetMapping("/file_name")
     public Result fileName(@RequestParam(name="fileName") String fileName) {
         fileService.findFileByFileName(fileName);
@@ -39,7 +46,7 @@ public class FileController {
     private String uploadFilePath;
 
     @RequestMapping("/upload")
-    public Result httpUpload(@RequestParam("files") MultipartFile[] files){
+    public Result httpUpload(@RequestParam("files") MultipartFile[] files) {
 
         for(int i=0;i<files.length;i++){
             String fileName = files[i].getOriginalFilename();  // 文件名
