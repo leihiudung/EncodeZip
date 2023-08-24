@@ -5,6 +5,7 @@ import com.bvt.encodezip.service.FileService;
 import com.bvt.encodezip.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -95,5 +96,12 @@ public class FileController {
         fileService.decodeFile(copyFile, uploadFilePath+"/decode");
         // dev分支
         return Result.ok("解密成功");
+    }
+    private final String prefix = "/filedownload";
+    @GetMapping("{filename}")
+    public ResponseEntity<?> download(@PathVariable("filename") String filename) {
+        // 在这之前进行一些必要的处理，比如鉴权，或者其它的处理逻辑。
+        // 通过X-Accel-Redirect返回在nginx中的实际下载地址
+        return ResponseEntity.ok().header("X-Accel-Redirect", prefix + "/" + filename).build();
     }
 }
