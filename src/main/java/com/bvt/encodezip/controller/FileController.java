@@ -5,13 +5,20 @@ import com.bvt.encodezip.service.FileService;
 import com.bvt.encodezip.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
 
 @RestController
+@RequestMapping("/employee")
 public class FileController {
 
     @Autowired
@@ -29,6 +36,12 @@ public class FileController {
         return Result.ok("work");
     }
 
+    @GetMapping("/all_file")
+    public Result findFile() {
+
+        return Result.ok("找到了");
+    }
+
     @GetMapping("/file_name")
     public Result fileName(@RequestParam(name="fileName") String fileName) {
         fileService.findFileByFileName(fileName);
@@ -39,7 +52,7 @@ public class FileController {
     private String uploadFilePath;
 
     @RequestMapping("/upload")
-    public Result httpUpload(@RequestParam("files") MultipartFile[] files){
+    public Result httpUpload(@RequestParam("files") MultipartFile[] files) {
 
         for(int i=0;i<files.length;i++){
             String fileName = files[i].getOriginalFilename();  // 文件名
@@ -88,5 +101,35 @@ public class FileController {
         fileService.decodeFile(copyFile, uploadFilePath+"/decode");
         // dev分支
         return Result.ok("解密成功");
+    }
+    private final String prefix = "/filedownload";
+//    @GetMapping("{filename}")
+//    public ResponseEntity<?> download(@PathVariable("filename") String filename) {
+//        // 在这之前进行一些必要的处理，比如鉴权，或者其它的处理逻辑。
+//        // 通过X-Accel-Redirect返回在nginx中的实际下载地址
+//        return ResponseEntity.ok().header("X-Accel-Redirect", prefix + "/" + filename).build();
+//    }
+
+    @GetMapping("{filename}")
+    public void download(@PathVariable("filename") String filename, HttpServletResponse response) throws IOException {
+        // 设置响应头，指定文件名
+        response.setHeader("Content-Disposition", "attachment; filename="+filename);
+
+        // 获取文件输入流
+        InputStream inputStream = new FileInputStream("D:\\Code\\FILE\\" + filename);
+
+        // 创建StreamingResponseBody对象，将文件内容写入响应输出流
+        StreamingResponseBody responseBody = outputStream -> {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            inputStream.close();
+        };
+
+        // 返回StreamingResponseBody对象
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        responseBody.writeTo(response.getOutputStream());
     }
 }
