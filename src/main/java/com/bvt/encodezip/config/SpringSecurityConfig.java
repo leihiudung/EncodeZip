@@ -67,7 +67,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             //任何 /admin 开头的路径下的请求都需要经过JWT验证
             .antMatchers(HttpMethod.GET, "/admin/**").hasAnyRole("admin", "visitor")
             .antMatchers("/admin/**").hasRole("admin")
-            .antMatchers("/employee/**").hasAnyRole("admin", "visitor")
+            .antMatchers("/employee/**").hasAnyRole("admin")
             //其它路径全部放行
             .anyRequest().permitAll()
             .and()

@@ -5,10 +5,15 @@ import com.bvt.encodezip.service.FileService;
 import com.bvt.encodezip.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
 
@@ -98,10 +103,33 @@ public class FileController {
         return Result.ok("解密成功");
     }
     private final String prefix = "/filedownload";
+//    @GetMapping("{filename}")
+//    public ResponseEntity<?> download(@PathVariable("filename") String filename) {
+//        // 在这之前进行一些必要的处理，比如鉴权，或者其它的处理逻辑。
+//        // 通过X-Accel-Redirect返回在nginx中的实际下载地址
+//        return ResponseEntity.ok().header("X-Accel-Redirect", prefix + "/" + filename).build();
+//    }
+
     @GetMapping("{filename}")
-    public ResponseEntity<?> download(@PathVariable("filename") String filename) {
-        // 在这之前进行一些必要的处理，比如鉴权，或者其它的处理逻辑。
-        // 通过X-Accel-Redirect返回在nginx中的实际下载地址
-        return ResponseEntity.ok().header("X-Accel-Redirect", prefix + "/" + filename).build();
+    public void download(@PathVariable("filename") String filename, HttpServletResponse response) throws IOException {
+        // 设置响应头，指定文件名
+        response.setHeader("Content-Disposition", "attachment; filename="+filename);
+
+        // 获取文件输入流
+        InputStream inputStream = new FileInputStream("D:\\Code\\FILE\\" + filename);
+
+        // 创建StreamingResponseBody对象，将文件内容写入响应输出流
+        StreamingResponseBody responseBody = outputStream -> {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            inputStream.close();
+        };
+
+        // 返回StreamingResponseBody对象
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        responseBody.writeTo(response.getOutputStream());
     }
 }
