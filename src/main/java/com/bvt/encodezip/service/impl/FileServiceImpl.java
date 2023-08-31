@@ -5,6 +5,7 @@ import com.bvt.encodezip.mapper.FileMapper;
 import com.bvt.encodezip.service.FileService;
 import com.bvt.encodezip.util.ZipInputStreamTool;
 import com.bvt.encodezip.util.ZipOutputStreamTool;
+import com.bvt.encodezip.vo.FileVO;
 import net.lingala.zip4j.model.enums.AesKeyStrength;
 import net.lingala.zip4j.model.enums.CompressionMethod;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
@@ -35,6 +36,12 @@ public class FileServiceImpl implements FileService {
     public File findFileByFileName(String fileName) {
         File file = fileMapper.findFileByFileName(fileName);
         return file;
+    }
+
+    @Override
+    public List<FileVO> getAllFile() {
+        List<FileVO> fileAll = fileMapper.getAllFile();
+        return fileAll;
     }
 
     @Override

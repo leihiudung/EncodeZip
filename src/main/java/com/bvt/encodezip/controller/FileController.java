@@ -2,6 +2,7 @@ package com.bvt.encodezip.controller;
 
 
 import com.bvt.encodezip.service.FileService;
+import com.bvt.encodezip.vo.FileVO;
 import com.bvt.encodezip.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
+import java.util.List;
 
 @RestController
 @RequestMapping("/employee")
@@ -38,8 +40,9 @@ public class FileController {
 
     @GetMapping("/all_file")
     public Result findFile() {
+        List<FileVO> fileAll = fileService.getAllFile();
 
-        return Result.ok("找到了");
+        return Result.ok("找到了", fileAll);
     }
 
     @GetMapping("/file_name")

@@ -1,12 +1,17 @@
 package com.bvt.encodezip.service;
 
 import com.bvt.encodezip.entity.File;
+import com.bvt.encodezip.vo.FileVO;
+
+import java.util.List;
 
 public interface FileService {
 
     void receiveFile(String fileName);
 
     void receiveFileComplete(String fileName, String fileSuffix, String teleporter);
+
+    List<FileVO> getAllFile();
 
     File findFileByFileName(String fileName);
 

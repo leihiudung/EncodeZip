@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bvt.encodezip.mapper.FileMapper">
+
     <resultMap id="file" type="com.bvt.encodezip.entity.File">
         <id property="id" column="id"/>
         <result property="fileName" column="file_name"/>
@@ -8,6 +9,16 @@
         <result property="teleporter" column="teleporter"/>
 
     </resultMap>
+
+    <resultMap id="filevo" type="com.bvt.encodezip.vo.FileVO">
+        <id property="id" column="id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="teleporter" column="teleporter"/>
+    </resultMap>
+
+    <select id="getAllFile" resultMap="filevo">
+        select id, file_name, teleporter from t_file;
+    </select>
 
     <!--按用户名查询User-->
     <select id="findFileByFileName" resultType="com.bvt.encodezip.entity.File">
