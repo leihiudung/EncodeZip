@@ -4,6 +4,7 @@ import com.bvt.encodezip.util.JacksonUtils;
 import com.bvt.encodezip.util.JwtUtils;
 import com.bvt.encodezip.vo.Result;
 import io.jsonwebtoken.Claims;
+import org.apache.juli.logging.Log;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @projectName: EncodeZip
@@ -35,6 +37,7 @@ public class JwtFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
+        Logger logger = Logger.getGlobal();
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         System.out.println("范文地址" + request.getRequestURI().startsWith(request.getContextPath() + "/employee"));
@@ -42,17 +45,20 @@ public class JwtFilter extends GenericFilterBean {
         if (!request.getRequestURI().startsWith(request.getContextPath() + "/admin") &&
                 !request.getRequestURI().startsWith(request.getContextPath() + "/employee")) {
             chain.doFilter(request, res);
+            logger.info("log info 1" + request.getContextPath().toString());
             return;
         }
         String jwt = request.getHeader("Authorization");
         if (JwtUtils.judgeTokenIsExist(jwt)) {
             try {
+                logger.info("log info2" + request.getContextPath().toString());
                 Claims claims = JwtUtils.getTokenBody(jwt);
                 String username = claims.getSubject();
                 List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get("authorities"));
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(token);
             } catch (Exception e) {
+                logger.info("log info3" + request.getContextPath().toString());
                 e.printStackTrace();
                 response.setContentType("application/json;charset=utf-8");
                 Result result = Result.create(403, "凭证已失效，请重新登录！");

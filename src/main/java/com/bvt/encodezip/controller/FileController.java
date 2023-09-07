@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/employee")
@@ -34,7 +35,7 @@ public class FileController {
 
     @PostMapping("/file_name_suffix_teleporter")
     public Result saveFile(@RequestBody String fileName, @RequestBody String fileSuffix, String teleporter) {
-        fileService.receiveFileComplete(fileName, fileSuffix, teleporter);
+//        fileService.receiveFileComplete(fileName, fileSuffix, teleporter);
         return Result.ok("work");
     }
 
@@ -56,7 +57,8 @@ public class FileController {
 
     @RequestMapping("/upload")
     public Result httpUpload(@RequestParam("files") MultipartFile[] files) {
-
+        Logger logger = Logger.getGlobal();
+        logger.info("log info UPLOAD");
         for(int i=0;i<files.length;i++){
             String fileFullName = files[i].getOriginalFilename();  // 文件名
             String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
@@ -64,17 +66,25 @@ public class FileController {
             if (!dest.getParentFile().exists()) {
                 dest.getParentFile().mkdirs();
             }
+
             try {
                 files[i].transferTo(dest);
             } catch (Exception e) {
                 return Result.error("解析出错");
             }
-            String suffixName = fileFullName.substring(fileFullName.lastIndexOf(".") + 1);
+            String suffixName = fileFullName.substring(fileFullName.lastIndexOf(".") + 1);  //  获取后缀名
 
-            boolean saveFlag = fileService.receiveFileComplete(fileName, suffixName, "tom");
+
             Boolean encodeFlag = fileService.encodeFile(new File(uploadFilePath), dest);
-            if (!encodeFlag && !saveFlag) {
-                return Result.error("加密出错");
+            if (!encodeFlag) {
+                return Result.error("加密/重命名出错");
+            }
+            dest.delete();
+
+            //  存储传送文件记录到数据库
+            boolean saveFlag = fileService.receiveFileComplete(fileName, suffixName, uploadFilePath, "tom");
+            if (!saveFlag) {
+                return Result.error("数据库记录出错");
             }
         }
 
