@@ -36,6 +36,6 @@
     </insert>
 
     <insert id="receiveFileComplete">
-        insert into t_file (file_name, file_suffix, file_path, teleporter) values (#{fileName}, #{fileSuffix}, #{filePath}, #{teleporter});
+        insert into t_file (file_name, file_suffix, file_path, file_alias_name, teleporter) values (#{fileName}, #{fileSuffix}, #{filePath}, #{aliasName}, #{teleporter});
     </insert>
 </mapper>

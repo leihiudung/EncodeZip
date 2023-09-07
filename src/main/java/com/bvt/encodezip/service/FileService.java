@@ -9,13 +9,13 @@ public interface FileService {
 
     void receiveFile(String fileName);
 
-    boolean receiveFileComplete(String fileName, String fileSuffix, String filePath, String teleporter);
+    boolean receiveFileComplete(String fileName, String fileSuffix, String filePath, String aliasName, String teleporter);
 
     List<FileVO> getAllFile();
 
     File findFileByFileName(String fileName);
 
-    Boolean encodeFile(java.io.File destinationFile, java.io.File file);
+    Boolean encodeFile(java.io.File destinationFile, java.io.File file, String aliasName);
 
     Boolean decodeFile(java.io.File destionaryFile, String key);
 }

@@ -30,8 +30,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public boolean receiveFileComplete(String fileName, String fileSuffix, String filePath, String teleporter) {
-        int savedCount = fileMapper.receiveFileComplete(fileName, fileSuffix, filePath, teleporter);
+    public boolean receiveFileComplete(String fileName, String fileSuffix, String filePath, String aliasName, String teleporter) {
+        int savedCount = fileMapper.receiveFileComplete(fileName, fileSuffix, filePath, aliasName, teleporter);
         if (savedCount > 0) {
             return true;
         }
@@ -51,11 +51,10 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Boolean encodeFile(java.io.File destinationDir, java.io.File file) {
+    public Boolean encodeFile(java.io.File destinationDir, java.io.File file, String aliasName) {
 
         List<java.io.File> needZipFile = new ArrayList<>();
-        long currentTime=System.currentTimeMillis();
-        String destinationFileName = String.format("%d.zip", currentTime);
+        String destinationFileName = String.format("%s.zip", aliasName);
         java.io.File targetFile = combinePath(destinationDir, destinationFileName);
 
         if (file.isFile()) {
@@ -76,7 +75,7 @@ public class FileServiceImpl implements FileService {
         }
 
         if (targetFile.exists()) {
-            String encodeFileName = String.format("%d.abc", currentTime);
+            String encodeFileName = String.format("%s.abc", aliasName);
             java.io.File newFile = combinePath(destinationDir, encodeFileName);
             return targetFile.renameTo(newFile);
         }

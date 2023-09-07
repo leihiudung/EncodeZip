@@ -4,6 +4,8 @@ package com.bvt.encodezip.controller;
 import com.bvt.encodezip.service.FileService;
 import com.bvt.encodezip.vo.FileVO;
 import com.bvt.encodezip.vo.Result;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.FileChannel;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -72,17 +75,20 @@ public class FileController {
             } catch (Exception e) {
                 return Result.error("解析出错");
             }
+
             String suffixName = fileFullName.substring(fileFullName.lastIndexOf(".") + 1);  //  获取后缀名
 
 
-            Boolean encodeFlag = fileService.encodeFile(new File(uploadFilePath), dest);
+            long currentTime=System.currentTimeMillis();
+            String destinationFileName = String.format("%d", currentTime);
+            Boolean encodeFlag = fileService.encodeFile(new File(uploadFilePath), dest, destinationFileName);
             if (!encodeFlag) {
                 return Result.error("加密/重命名出错");
             }
             dest.delete();
 
             //  存储传送文件记录到数据库
-            boolean saveFlag = fileService.receiveFileComplete(fileName, suffixName, uploadFilePath, "tom");
+            boolean saveFlag = fileService.receiveFileComplete(fileName, suffixName, uploadFilePath, destinationFileName, "tom");
             if (!saveFlag) {
                 return Result.error("数据库记录出错");
             }

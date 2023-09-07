@@ -45,20 +45,17 @@ public class JwtFilter extends GenericFilterBean {
         if (!request.getRequestURI().startsWith(request.getContextPath() + "/admin") &&
                 !request.getRequestURI().startsWith(request.getContextPath() + "/employee")) {
             chain.doFilter(request, res);
-            logger.info("log info 1" + request.getContextPath().toString());
             return;
         }
         String jwt = request.getHeader("Authorization");
         if (JwtUtils.judgeTokenIsExist(jwt)) {
             try {
-                logger.info("log info2" + request.getContextPath().toString());
                 Claims claims = JwtUtils.getTokenBody(jwt);
                 String username = claims.getSubject();
                 List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get("authorities"));
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(token);
             } catch (Exception e) {
-                logger.info("log info3" + request.getContextPath().toString());
                 e.printStackTrace();
                 response.setContentType("application/json;charset=utf-8");
                 Result result = Result.create(403, "凭证已失效，请重新登录！");
