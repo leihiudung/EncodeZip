@@ -13,7 +13,7 @@ public interface FileMapper {
 
     void receiveFile(String fileName);
 
-    void receiveFile(String fileName, String fileSuffix, String teleporter);
+    int receiveFileComplete(String fileName, String fileSuffix, String teleporter);
 
     List<FileVO> getAllFile();
 

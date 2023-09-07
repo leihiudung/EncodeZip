@@ -58,7 +58,8 @@ public class FileController {
     public Result httpUpload(@RequestParam("files") MultipartFile[] files) {
 
         for(int i=0;i<files.length;i++){
-            String fileName = files[i].getOriginalFilename();  // 文件名
+            String fileFullName = files[i].getOriginalFilename();  // 文件名
+            String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
             File dest = new File(uploadFilePath +'/'+ fileName);
             if (!dest.getParentFile().exists()) {
                 dest.getParentFile().mkdirs();
@@ -68,13 +69,14 @@ public class FileController {
             } catch (Exception e) {
                 return Result.error("解析出错");
             }
+            String suffixName = fileFullName.substring(fileFullName.lastIndexOf(".") + 1);
+
+            boolean saveFlag = fileService.receiveFileComplete(fileName, suffixName, "tom");
             Boolean encodeFlag = fileService.encodeFile(new File(uploadFilePath), dest);
-            if (!encodeFlag) {
+            if (!encodeFlag && !saveFlag) {
                 return Result.error("加密出错");
             }
         }
-
-
 
         return Result.ok("上传成功");
     }
@@ -115,9 +117,10 @@ public class FileController {
 
     @GetMapping("{filename}")
     public void download(@PathVariable("filename") String filename, HttpServletResponse response) throws IOException {
+        com.bvt.encodezip.entity.File file = fileService.findFileByFileName(filename);
         // 设置响应头，指定文件名
         response.setHeader("Content-Disposition", "attachment; filename="+filename);
-
+        response.addHeader("filetype",  file.fileSuffix);
         // 获取文件输入流
         InputStream inputStream = new FileInputStream("D:\\Code\\FILE\\" + filename);
 
@@ -133,6 +136,7 @@ public class FileController {
 
         // 返回StreamingResponseBody对象
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
         responseBody.writeTo(response.getOutputStream());
     }
 }

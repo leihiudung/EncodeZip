@@ -9,7 +9,7 @@ public interface FileService {
 
     void receiveFile(String fileName);
 
-    void receiveFileComplete(String fileName, String fileSuffix, String teleporter);
+    boolean receiveFileComplete(String fileName, String fileSuffix, String teleporter);
 
     List<FileVO> getAllFile();
 

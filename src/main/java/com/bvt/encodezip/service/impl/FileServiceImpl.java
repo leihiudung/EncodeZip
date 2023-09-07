@@ -9,6 +9,8 @@ import com.bvt.encodezip.vo.FileVO;
 import net.lingala.zip4j.model.enums.AesKeyStrength;
 import net.lingala.zip4j.model.enums.CompressionMethod;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
+import org.apache.juli.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +30,12 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void receiveFileComplete(String fileName, String fileSuffix, String teleporter) {
-
+    public boolean receiveFileComplete(String fileName, String fileSuffix, String teleporter) {
+        int savedCount = fileMapper.receiveFileComplete(fileName, fileSuffix, teleporter);
+        if (savedCount > 0) {
+            return true;
+        }
+        return false;
     }
 
     @Override
