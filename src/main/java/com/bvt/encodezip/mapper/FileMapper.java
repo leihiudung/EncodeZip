@@ -18,4 +18,6 @@ public interface FileMapper {
     List<FileVO> getAllFile();
 
     File findFileByFileName(String fileName);
+    FileVO findFileByFileAliasName(String fileName);
+
 }

@@ -45,6 +45,12 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public FileVO findFileByFileAliasName(String fileName) {
+        FileVO file = fileMapper.findFileByFileAliasName(fileName);
+        return file;
+    }
+
+    @Override
     public List<FileVO> getAllFile() {
         List<FileVO> fileAll = fileMapper.getAllFile();
         return fileAll;

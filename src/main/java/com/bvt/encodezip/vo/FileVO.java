@@ -19,6 +19,7 @@ import lombok.ToString;
 public class FileVO {
     public int id;
     public String fileName;
+    public String fileAliasName;
     public String fileSuffix;
     public String teleporter;   //  传送人
 }

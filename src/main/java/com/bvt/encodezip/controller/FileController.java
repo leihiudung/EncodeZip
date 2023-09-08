@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.List;
@@ -131,14 +132,20 @@ public class FileController {
 //        return ResponseEntity.ok().header("X-Accel-Redirect", prefix + "/" + filename).build();
 //    }
 
-    @GetMapping("{filename}")
-    public void download(@PathVariable("filename") String filename, HttpServletResponse response) throws IOException {
-        com.bvt.encodezip.entity.File file = fileService.findFileByFileName(filename);
+    @GetMapping("{filealiasname}")
+    public void download(@PathVariable("filealiasname") String filealiasname, HttpServletResponse response) throws IOException {
+        FileVO fileVO = fileService.findFileByFileAliasName(filealiasname);
         // 设置响应头，指定文件名
-        response.setHeader("Content-Disposition", "attachment; filename="+filename);
-        response.addHeader("filetype",  file.fileSuffix);
+        response.setHeader("Content-Disposition", "attachment;");
+        response.setCharacterEncoding("UTF-8");
+
+//        application/octet-stream;charset=UTF-8
+
+        response.addHeader("filename", URLEncoder.encode(fileVO.fileName, "UTF-8"));
+        response.addHeader("filealiasname", fileVO.getFileAliasName());
+        response.addHeader("filetype",  fileVO.fileSuffix);
         // 获取文件输入流
-        InputStream inputStream = new FileInputStream("D:\\Code\\FILE\\" + filename);
+        InputStream inputStream = new FileInputStream("D:\\Code\\FILE\\" + fileVO.getFileAliasName() + ".abc");
 
         // 创建StreamingResponseBody对象，将文件内容写入响应输出流
         StreamingResponseBody responseBody = outputStream -> {

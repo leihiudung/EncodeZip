@@ -14,6 +14,7 @@ public interface FileService {
     List<FileVO> getAllFile();
 
     File findFileByFileName(String fileName);
+    FileVO findFileByFileAliasName(String fileName);
 
     Boolean encodeFile(java.io.File destinationFile, java.io.File file, String aliasName);
 
