@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+
+
 @RestController
 @RequestMapping("/employee")
 public class FileController {
@@ -145,7 +147,7 @@ public class FileController {
         response.addHeader("filealiasname", fileVO.getFileAliasName());
         response.addHeader("filetype",  fileVO.fileSuffix);
         // 获取文件输入流
-        InputStream inputStream = new FileInputStream("D:\\Code\\FILE\\" + fileVO.getFileAliasName() + ".abc");
+        InputStream inputStream = new FileInputStream(uploadFilePath + File.separator + fileVO.getFileAliasName() + ".abc");
 
         // 创建StreamingResponseBody对象，将文件内容写入响应输出流
         StreamingResponseBody responseBody = outputStream -> {
