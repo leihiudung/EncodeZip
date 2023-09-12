@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ZipInputStreamTool {
 
@@ -124,12 +126,31 @@ public class ZipInputStreamTool {
     }
 
     private static File renameSuffix(File mp4File) {
-        String encodeFilePath = mp4File.getParentFile().getAbsolutePath();
-        String decodeFilePath = combinePath(encodeFilePath, "decode");
-        File zipSuffixFile = new File(combinePath(decodeFilePath, "decode.zip"));
-        if (mp4File.renameTo(zipSuffixFile)) {
-            return zipSuffixFile;
+        Logger log = Logger.getLogger("tesglog");
+        String fName = mp4File.getName().trim();
+        fName = fName.substring(fName.lastIndexOf("\\")+1);
+        int pos = fName.lastIndexOf(".");
+        if (pos > 0) {
+            fName = fName.substring(0, pos);
         }
+        String encodeFilePath = mp4File.getParentFile().getAbsolutePath();
+        String decodeFilePath = combinePath(encodeFilePath, "office");
+        File zipSuffixFile = new File(combinePath(encodeFilePath, fName + ".zip"));
+        try {
+            log.setLevel(Level.ALL);
+            log.info(zipSuffixFile.isDirectory() + ":" + zipSuffixFile.isFile() + ":" + zipSuffixFile.exists());
+            zipSuffixFile.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        boolean flag = false;
+        try {
+            flag = mp4File.renameTo(zipSuffixFile);
+            return zipSuffixFile;
+        } catch (Exception e) {
+            System.out.println("" + e.toString());
+        }
+
         return null;
     }
 

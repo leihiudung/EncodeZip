@@ -2,10 +2,13 @@ package com.bvt.encodezip.controller;
 
 
 import com.bvt.encodezip.service.FileService;
+import com.bvt.encodezip.util.HashUtils;
+import com.bvt.encodezip.util.Office2HtmlUtils;
 import com.bvt.encodezip.vo.FileVO;
 import com.bvt.encodezip.vo.Result;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.jodconverter.core.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -136,18 +139,30 @@ public class FileController {
 
     @GetMapping("{filealiasname}")
     public void download(@PathVariable("filealiasname") String filealiasname, HttpServletResponse response) throws IOException {
+
         FileVO fileVO = fileService.findFileByFileAliasName(filealiasname);
+        //  获取文件输入流
+        InputStream inputStream;
+
+        String officeType = "docs,doc,xls,xlsx,ppt,pptx";
+        if (officeType.contains(fileVO.getFileSuffix())) {
+            String path = fileService.fineFilePath(fileVO.getFileAliasName());
+            String decodePath = onServeDecode(new File(path + File.separator + fileVO.getFileAliasName() + ".abc"));
+
+            boolean flag = Office2HtmlUtils.office2Pdf(decodePath + File.separator + fileVO.getFileAliasName() + "." + fileVO.getFileSuffix(), fileVO.getFileAliasName() + "." + fileVO.getFileSuffix());
+            inputStream = new FileInputStream(decodePath + File.separator + fileVO.getFileAliasName() + "." + fileVO.getFileSuffix());
+        } else {
+            inputStream = new FileInputStream(uploadFilePath + File.separator + fileVO.getFileAliasName() + ".abc");
+        }
         // 设置响应头，指定文件名
         response.setHeader("Content-Disposition", "attachment;");
         response.setCharacterEncoding("UTF-8");
-
-//        application/octet-stream;charset=UTF-8
 
         response.addHeader("filename", URLEncoder.encode(fileVO.fileName, "UTF-8"));
         response.addHeader("filealiasname", fileVO.getFileAliasName());
         response.addHeader("filetype",  fileVO.fileSuffix);
         // 获取文件输入流
-        InputStream inputStream = new FileInputStream(uploadFilePath + File.separator + fileVO.getFileAliasName() + ".abc");
+
 
         // 创建StreamingResponseBody对象，将文件内容写入响应输出流
         StreamingResponseBody responseBody = outputStream -> {
@@ -163,5 +178,14 @@ public class FileController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
         responseBody.writeTo(response.getOutputStream());
+    }
+
+    private String onServeDecode(File file) {
+        String destDirPath = file.getParent() + File.separator + "office";
+        Boolean decodeFlag = fileService.decodeFile(file, destDirPath);
+        if (decodeFlag.booleanValue()) {
+         return destDirPath;
+        }
+        return null;
     }
 }

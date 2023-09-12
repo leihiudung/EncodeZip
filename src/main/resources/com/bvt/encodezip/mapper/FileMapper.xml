@@ -32,6 +32,10 @@
         select * from t_file where file_name = #{fileName};
     </select>
 
+    <select id="fineFilePath" resultType="java.lang.String">
+        select file_path from t_file where file_alias_name = #{fileAliasName};
+    </select>
+
     <!--按文件别名查询-->
     <select id="findFileByFileAliasName" resultType="com.bvt.encodezip.vo.FileVO">
         select id, file_name, file_alias_name, file_suffix, teleporter from t_file where file_alias_name = #{fileName};

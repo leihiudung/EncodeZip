@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface FileService {
 
+    String fineFilePath(String fileAliasName);
     void receiveFile(String fileName);
 
     boolean receiveFileComplete(String fileName, String fileSuffix, String filePath, String aliasName, String teleporter);

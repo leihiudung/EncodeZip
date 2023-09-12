@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface FileMapper {
 
+    String fineFilePath(String fileAliasName);
     void receiveFile(String fileName);
 
     int receiveFileComplete(String fileName, String fileSuffix, String filePath, String aliasName, String teleporter);

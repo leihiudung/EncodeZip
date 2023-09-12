@@ -12,6 +12,8 @@ import org.springframework.util.DigestUtils;
  * @description: TODO
  */
 public class HashUtils {
+
+    public static final String CryptCode = "abcgo";
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     public static String getMd5(CharSequence str) {

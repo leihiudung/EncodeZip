@@ -5,6 +5,7 @@ import com.bvt.encodezip.mapper.FileMapper;
 import com.bvt.encodezip.service.FileService;
 import com.bvt.encodezip.util.ZipInputStreamTool;
 import com.bvt.encodezip.util.ZipOutputStreamTool;
+
 import com.bvt.encodezip.vo.FileVO;
 import net.lingala.zip4j.model.enums.AesKeyStrength;
 import net.lingala.zip4j.model.enums.CompressionMethod;
@@ -23,6 +24,12 @@ public class FileServiceImpl implements FileService {
 
     @Autowired
     FileMapper fileMapper;
+
+    @Override
+    public String fineFilePath(String fileAliasName) {
+        String filePaht = fileMapper.fineFilePath(fileAliasName);
+        return filePaht;
+    }
 
     @Override
     public void receiveFile(String fileName) {
@@ -88,6 +95,12 @@ public class FileServiceImpl implements FileService {
         return false;
     }
 
+    /**
+     * 解密文件
+     * @param destionaryFile 目标文件路径
+     * @param key 加密密钥
+     * @return
+     */
     @Override
     public Boolean decodeFile(java.io.File destionaryFile, String key) {
 
