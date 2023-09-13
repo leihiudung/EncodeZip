@@ -19,5 +19,7 @@ public interface FileService {
 
     Boolean encodeFile(java.io.File destinationFile, java.io.File file, String aliasName);
 
-    Boolean decodeFile(java.io.File destionaryFile, String key);
+    java.io.File[] decodeFile(java.io.File destionaryFile, String key);
+
+    String unzipFile(String filePath);
 }

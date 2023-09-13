@@ -143,14 +143,28 @@ public class FileController {
         FileVO fileVO = fileService.findFileByFileAliasName(filealiasname);
         //  获取文件输入流
         InputStream inputStream;
-
-        String officeType = "docs,doc,xls,xlsx,ppt,pptx";
+        Logger log = Logger.getLogger("tesglog");
+        String officeType = "docx,doc,xls,xlsx,ppt,pptx";
         if (officeType.contains(fileVO.getFileSuffix())) {
             String path = fileService.fineFilePath(fileVO.getFileAliasName());
-            String decodePath = onServeDecode(new File(path + File.separator + fileVO.getFileAliasName() + ".abc"));
+            File officeFile = new File(path + File.separator + fileVO.getFileAliasName() + ".abc");
 
-            boolean flag = Office2HtmlUtils.office2Pdf(decodePath + File.separator + fileVO.getFileAliasName() + "." + fileVO.getFileSuffix(), fileVO.getFileAliasName() + "." + fileVO.getFileSuffix());
-            inputStream = new FileInputStream(decodePath + File.separator + fileVO.getFileAliasName() + "." + fileVO.getFileSuffix());
+            String decodePath = onServeDecode(officeFile);
+
+            Office2HtmlUtils.office2PDF(decodePath, decodePath + ".pdf");
+
+            File needDeleteFile = new File(decodePath);
+            needDeleteFile.delete();    //   删除解压后的文件,为了后面逻辑做准备
+
+            File[] files = new File[1];
+            files[0] = new File(decodePath + ".pdf");
+
+            String[] pathArr = repackageToEncodePackage(files);
+
+            inputStream = new FileInputStream(pathArr.length > 0 ? pathArr[0] : null);
+
+//            boolean flag = Office2HtmlUtils.office2Pdf(decodePath + File.separator + fileVO.getFileAliasName() + "." + fileVO.getFileSuffix(), fileVO.getFileAliasName() + "." + fileVO.getFileSuffix());
+//            inputStream = new FileInputStream(pathArr[0]);
         } else {
             inputStream = new FileInputStream(uploadFilePath + File.separator + fileVO.getFileAliasName() + ".abc");
         }
@@ -180,12 +194,48 @@ public class FileController {
         responseBody.writeTo(response.getOutputStream());
     }
 
-    private String onServeDecode(File file) {
+    private String onServeDecode(File file) throws IOException {
         String destDirPath = file.getParent() + File.separator + "office";
-        Boolean decodeFlag = fileService.decodeFile(file, destDirPath);
-        if (decodeFlag.booleanValue()) {
-         return destDirPath;
+        File copyDestDir = new File(destDirPath + File.separator + file.getName());
+        InputStream input = null;
+        OutputStream output = null;
+        try {
+            input = new FileInputStream(file);
+            output = new FileOutputStream(copyDestDir);
+            byte[] buf = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = input.read(buf)) > 0) {
+                output.write(buf, 0, bytesRead);
+            }
+        } finally {
+            input.close();
+            output.close();
+        }
+        File[] decodeFile = fileService.decodeFile(copyDestDir, destDirPath);
+        if (decodeFile != null && decodeFile.length > 0) {
+         return destDirPath + File.separator + decodeFile[0].getName();
         }
         return null;
     }
+
+    private String[] repackageToEncodePackage(File[] files) {
+        String[] pathStr = new String[1];
+        for(int i=0;i<files.length;i++){
+
+            int nameIndex = files[i].getName().lastIndexOf('.');
+            File withoutSuffixFile = new File(files[i].getParent() + File.separator + files[i].getName().substring(0, nameIndex));
+            String fileFullName = files[i].getName();  // 文件名
+            files[i].renameTo(withoutSuffixFile);
+            long currentTime=System.currentTimeMillis();
+            String destinationFileName = String.format("%d", currentTime);
+            Boolean encodeFlag = fileService.encodeFile(new File(files[i].getParentFile().getPath()), withoutSuffixFile, destinationFileName);
+            if (!encodeFlag) {
+                return null;
+            }
+//            dest.delete();
+            pathStr[i] = files[i].getParentFile().getPath() + File.separator + destinationFileName + ".abc";
+        }
+        return pathStr;
+    }
+
 }

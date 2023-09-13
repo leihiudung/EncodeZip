@@ -10,8 +10,6 @@ import com.bvt.encodezip.vo.FileVO;
 import net.lingala.zip4j.model.enums.AesKeyStrength;
 import net.lingala.zip4j.model.enums.CompressionMethod;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
-import org.apache.juli.logging.Log;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -97,19 +95,21 @@ public class FileServiceImpl implements FileService {
 
     /**
      * 解密文件
+     *
      * @param destionaryFile 目标文件路径
-     * @param key 加密密钥
+     * @param key            加密密钥
      * @return
      */
     @Override
-    public Boolean decodeFile(java.io.File destionaryFile, String key) {
+    public java.io.File[] decodeFile(java.io.File destionaryFile, String key) {
 
+        java.io.File[] decodeFile;
         try {
-            ZipInputStreamTool.deCompress(destionaryFile, key, new String("abcgo"));
+            decodeFile = ZipInputStreamTool.deCompress(destionaryFile, key, new String("abcgo"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return decodeFile;
     }
 
     public static java.io.File combinePath(java.io.File path1, String path2)
@@ -120,5 +120,10 @@ public class FileServiceImpl implements FileService {
 
         return tagetFile;
 
+    }
+
+    @Override
+    public String unzipFile(String filePath) {
+        return null;
     }
 }

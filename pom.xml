@@ -37,6 +37,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -61,11 +62,6 @@
 
 
         <!--jodconverter 本地支持包 -->
-<!--        <dependency>-->
-<!--            <groupId>org.jodconverter</groupId>-->
-<!--            <artifactId>jodconverter-local</artifactId>-->
-<!--            <version>4.2.2</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.jodconverter</groupId>
             <artifactId>jodconverter-local</artifactId>

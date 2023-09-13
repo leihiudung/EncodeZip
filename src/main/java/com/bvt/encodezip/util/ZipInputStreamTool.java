@@ -86,6 +86,7 @@ public class ZipInputStreamTool {
      * @throws ZipException 异常
      */
     public static File[] deCompress(File zipFile, String dest, String password) throws ZipException {
+        Logger log = Logger.getLogger("tesglog");
         //1.判断指定目录是否存在
         File destDir = new File(dest);
         boolean jj = destDir.isDirectory();
@@ -96,9 +97,11 @@ public class ZipInputStreamTool {
 
         // 先做后缀转换
         File currentSuffixFile = renameSuffix(zipFile);
-        if (currentSuffixFile == null) {
+        if (currentSuffixFile == null || currentSuffixFile.length() == 0) {
             return null;
         }
+        log.info("decompress" + currentSuffixFile.exists() + ":" + currentSuffixFile.isFile() + "file:" + currentSuffixFile.isDirectory());
+
 
         //2.初始化zip工具
         ZipFile zFile = new ZipFile(currentSuffixFile);
@@ -136,13 +139,12 @@ public class ZipInputStreamTool {
         String encodeFilePath = mp4File.getParentFile().getAbsolutePath();
         String decodeFilePath = combinePath(encodeFilePath, "office");
         File zipSuffixFile = new File(combinePath(encodeFilePath, fName + ".zip"));
-        try {
-            log.setLevel(Level.ALL);
-            log.info(zipSuffixFile.isDirectory() + ":" + zipSuffixFile.isFile() + ":" + zipSuffixFile.exists());
-            zipSuffixFile.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        log.setLevel(Level.ALL);
+        if (zipSuffixFile.exists()) {
+            zipSuffixFile.delete();
         }
+
         boolean flag = false;
         try {
             flag = mp4File.renameTo(zipSuffixFile);
