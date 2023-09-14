@@ -8,7 +8,7 @@ import com.bvt.encodezip.vo.FileVO;
 import com.bvt.encodezip.vo.Result;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.jodconverter.core.office.OfficeException;
+import org.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -151,6 +151,8 @@ public class FileController {
 
             String decodePath = onServeDecode(officeFile);
 
+//            Office2HtmlUtils utils = new Office2HtmlUtils();
+//            Office2HtmlUtils.office2Pdf(decodePath, decodePath);
             Office2HtmlUtils.office2PDF(decodePath, decodePath + ".pdf");
 
             File needDeleteFile = new File(decodePath);
@@ -237,5 +239,7 @@ public class FileController {
         }
         return pathStr;
     }
+
+
 
 }

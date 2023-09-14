@@ -1,11 +1,15 @@
 package com.bvt.encodezip.util;
 
-import org.jodconverter.core.DocumentConverter;
-import org.jodconverter.core.office.OfficeException;
-import org.jodconverter.core.office.OfficeManager;
-import org.jodconverter.core.office.OfficeUtils;
-import org.jodconverter.local.JodConverter;
-import org.jodconverter.local.office.LocalOfficeManager;
+//import org.jodconverter.DocumentConverter;
+import org.jodconverter.JodConverter;
+import org.jodconverter.office.LocalOfficeManager;
+import org.jodconverter.office.OfficeException;
+import org.jodconverter.office.OfficeManager;
+import org.jodconverter.office.OfficeUtils;
+import com.artofsolving.jodconverter.DocumentConverter;
+
+import org.jodconverter.JodConverter;
+import org.jodconverter.office.LocalOfficeManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,32 +24,38 @@ import java.util.logging.Logger;
  * @author: Tom
  * @description: TODO
  */
-
+@Component
 public class Office2HtmlUtils {
 
+
+
     @Value("${file.upload.url.office}")
-    private static String decodeFilePath;
+    private String decodeFilePath;
 
     @Autowired
-    private DocumentConverter converter;
+    public static DocumentConverter converter;
 
-    public boolean office2Pdf(String officeFilePath, String fileName) {
+    public static boolean office2Pdf(String targetFilePath, String pdfFileName) {
 //        File fileDir = new File(decodeFilePath);//转换之后文件生成的地址
 //        if (!fileDir.exists()) {
 //            fileDir.mkdirs();
 //        }
 
-        File officeFile = new File(officeFilePath);
+        File officeFile = new File(targetFilePath);
         try {
 //            OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1", 8100);
 //            connection.connect();
 //            // 转换
 //            DocumentConverter converter = new StreamOpenOfficeDocumentConverter (connection);
 
-            //文件转化
-            converter.convert(officeFile).to(new File(decodeFilePath + File.pathSeparator + fileName + ".pdf")).execute();
+            OfficeManager officeManager = LocalOfficeManager.builder().install()
+                    .officeHome("C:\\Program Files (x86)\\OpenOffice 4")
+                    .build();
 
-        } catch (OfficeException e) {
+            //文件转化
+//            converter.convert(officeFile, officeFile).to(new File(pdfFileName + ".pdf")).execute();
+
+        } catch (Exception e) {
             return false;
         }
                 //使用response,将pdf文件以流的方式发送的前段
@@ -56,6 +66,12 @@ public class Office2HtmlUtils {
         return true;
     }
 
+//    public static boolean office2PDF(String sourceFile, String destFile) {
+//        Logger log = Logger.getLogger("tesglog");
+//
+//        return true;
+//    }
+
     public static boolean office2PDF(String sourceFile, String destFile) {
         Logger log = Logger.getLogger("tesglog");
 
@@ -63,6 +79,7 @@ public class Office2HtmlUtils {
                 = LocalOfficeManager.builder().install()
                 .officeHome("C:\\Program Files (x86)\\OpenOffice 4")
                 .build();
+//        LocalOfficeManager  officeManager = LocalOfficeManager.install();
         try {
             File inputFile = new File(sourceFile);
             if (!inputFile.exists()) {
