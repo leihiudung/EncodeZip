@@ -64,6 +64,9 @@ public class FileController {
     @Value("${file.upload.url}")
     private String uploadFilePath;
 
+    @Value("${file.upload.url.office}")
+    private String decodeFilePath;
+
     @RequestMapping("/upload")
     public Result httpUpload(@RequestParam("files") MultipartFile[] files) {
         Logger logger = Logger.getGlobal();
@@ -153,7 +156,7 @@ public class FileController {
 
 //            Office2HtmlUtils utils = new Office2HtmlUtils();
 //            Office2HtmlUtils.office2Pdf(decodePath, decodePath);
-            Office2HtmlUtils.office2PDF(decodePath, decodePath + ".pdf");
+            Office2HtmlUtils.office2PDF(decodePath, decodePath + ".pdf", decodeFilePath);
 
             File needDeleteFile = new File(decodePath);
             needDeleteFile.delete();    //   删除解压后的文件,为了后面逻辑做准备

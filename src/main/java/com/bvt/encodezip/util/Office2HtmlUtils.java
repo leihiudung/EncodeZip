@@ -72,12 +72,12 @@ public class Office2HtmlUtils {
 //        return true;
 //    }
 
-    public static boolean office2PDF(String sourceFile, String destFile) {
+    public static boolean office2PDF(String sourceFile, String destFile, String decodeFilePath) {
         Logger log = Logger.getLogger("tesglog");
 
         OfficeManager officeManager
                 = LocalOfficeManager.builder().install()
-                .officeHome("C:\\Program Files (x86)\\OpenOffice 4")
+                .officeHome(decodeFilePath)
                 .build();
 //        LocalOfficeManager  officeManager = LocalOfficeManager.install();
         try {
