@@ -64,7 +64,7 @@ public class FileController {
     @Value("${file.upload.url}")
     private String uploadFilePath;
 
-    @Value("${file.upload.url.office}")
+    @Value("${file.openoffice4.path}")
     private String decodeFilePath;
 
     @RequestMapping("/upload")
